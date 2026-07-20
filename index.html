@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kallpa</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --fg: #f4f6f8;
+    --muted: #9aa5b1;
+    --accent: #4fd1c5;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f4f6f8; --fg: #0b0f14; --muted: #55606b; --accent: #0f9488; }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+  main { max-width: 560px; }
+  .mark {
+    font-size: 15px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-size: clamp(2rem, 6vw, 3rem);
+    margin: 0 0 16px;
+    letter-spacing: -0.02em;
+  }
+  p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+  footer {
+    margin-top: 40px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<main>
+  <div class="mark">Kallpa</div>
+  <h1>Próximamente</h1>
+  <p>Estamos construyendo Kallpa. Pronto más información aquí.</p>
+  <footer>
+    Contacto: <a href="mailto:contacto@kallpaio.com">contacto@kallpaio.com</a>
+  </footer>
+</main>
+</body>
+</html>
