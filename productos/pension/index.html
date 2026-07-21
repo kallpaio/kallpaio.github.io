@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kallpa Pension</title>
+</head>
+<body>
+<style>
+  :root {
+    --bg: #F5F7FA;
+    --panel: #FFFFFF;
+    --ink: #0C3D68;
+    --ink-deep: #081C30;
+    --text: #1F2933;
+    --text-soft: #5A6B7B;
+    --accent: #0F4C81;
+    --accent-hover: #0C3D68;
+    --accent-soft: rgba(15, 76, 129, 0.08);
+    --line: #D9DFE7;
+    --sidebar: #334E68;
+    --info: #2B6CB0;
+    --on-dark: #F5F7FA;
+    --on-dark-soft: rgba(245, 247, 250, 0.68);
+    --on-dark-line: rgba(245, 247, 250, 0.16);
+
+    --font-display: -apple-system, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-body: -apple-system, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-mono: 'SF Mono', ui-monospace, Menlo, Consolas, 'Liberation Mono', monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+
+  img, svg { display: block; max-width: 100%; }
+  /* module-icon <use> instances: currentColor must resolve against the icon's own
+     container (.ic-badge / .r-icon / .m-ic), not against the hidden <g id="ic-defs">
+     wrapper the <symbol>s live in — presentation attributes on that wrapper never
+     reach the cloned <use> content, so we set them here instead, scoped to these
+     three containers only (kallpa-glyph logo marks use their own fill, untouched). */
+  .ic-badge use, .r-icon use, .m-ic use {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-left: clamp(20px, 6vw, 64px);
+    padding-right: clamp(20px, 6vw, 64px);
+  }
+
+  /* ---- shared type ---- */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 16px;
+  }
+  section.dark .eyebrow { color: #8FB4D9; }
+  h2.claim {
+    font-family: var(--font-display);
+    font-weight: 650;
+    font-size: clamp(2rem, 4.4vw, 3.4rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  p.sub {
+    font-size: clamp(1.02rem, 1.4vw, 1.22rem);
+    line-height: 1.6;
+    color: var(--text-soft);
+    max-width: 56ch;
+    margin: 20px 0 0;
+  }
+  section.dark p.sub { color: var(--on-dark-soft); }
+
+  /* ---- reveal ---- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s cubic-bezier(.2,.7,.2,1), transform 0.9s cubic-bezier(.2,.7,.2,1);
+  }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* ---- nav ---- */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px clamp(20px, 6vw, 64px);
+    background: rgba(8, 28, 48, 0.55);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border-bottom: 1px solid rgba(245,247,250,0.08);
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+  .nav.on-light {
+    background: rgba(255,255,255,0.72);
+    border-bottom-color: var(--line);
+  }
+  .nav-brand { display: flex; align-items: center; gap: 10px; color: #fff; }
+  .nav.on-light .nav-brand { color: var(--ink); }
+  .nav-brand svg { width: 22px; height: 22px; }
+  .nav-brand span {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  .nav-links {
+    display: flex;
+    gap: 30px;
+    font-size: 0.86rem;
+    color: var(--on-dark-soft);
+  }
+  .nav.on-light .nav-links { color: var(--text-soft); }
+  .nav-links a { text-decoration: none; transition: color 0.2s ease; }
+  .nav-links a:hover { color: #fff; }
+  .nav.on-light .nav-links a:hover { color: var(--accent); }
+  .nav-cta {
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  @media (max-width: 720px) { .nav-links { display: none; } }
+
+  /* ---- hero ---- */
+  .hero {
+    position: relative;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background:
+      radial-gradient(ellipse at 50% -10%, #143A5C 0%, transparent 55%),
+      linear-gradient(180deg, var(--ink-deep) 0%, #0A2540 55%, var(--ink-deep) 100%);
+    color: #fff;
+    overflow: hidden;
+  }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.55; }
+  .hero-inner { position: relative; z-index: 2; text-align: center; padding: 120px 20px 80px; }
+  .hero-mark { width: 64px; height: 64px; margin: 0 auto 28px; color: #fff; opacity: 0.95; }
+  h1.hero-title {
+    font-family: var(--font-display);
+    font-weight: 680;
+    font-size: clamp(2.6rem, 7vw, 5.6rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin: 0 auto;
+    max-width: 16ch;
+    text-wrap: balance;
+    background: linear-gradient(180deg, #ffffff 0%, #cfe0ef 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+    color: var(--on-dark-soft);
+    max-width: 46ch;
+    margin: 26px auto 0;
+    line-height: 1.6;
+  }
+  .hero-cta {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: var(--font-body);
+    font-size: 0.94rem;
+    font-weight: 600;
+    padding: 13px 26px;
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+    display: inline-block;
+  }
+  .btn-primary { background: #fff; color: var(--ink); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,0,0,0.28); }
+  .btn-ghost { color: #fff; border-color: rgba(255,255,255,0.35); }
+  .btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,0.08); }
+  section.light .btn-primary { background: var(--accent); color: #fff; }
+  section.light .btn-primary:hover { background: var(--accent-hover); }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 30px; left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--on-dark-soft);
+    z-index: 2;
+  }
+  .scroll-cue .chev {
+    width: 9px; height: 9px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    animation: bob 1.8s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100% { transform: rotate(45deg) translate(0,0); } 50% { transform: rotate(45deg) translate(3px,3px); } }
+
+  /* ---- sections ---- */
+  section { position: relative; padding: clamp(72px, 12vw, 150px) 0; }
+  section.dark { background: var(--ink-deep); color: #fff; }
+  section.light { background: var(--bg); }
+  section.panel { background: var(--panel); }
+
+  /* ---- big stat ---- */
+  .stat-hero {
+    text-align: center;
+  }
+  .stat-hero .figure {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(3.2rem, 11vw, 8rem);
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    background: linear-gradient(135deg, #ffffff 0%, #9fc3e6 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-hero .figure-label {
+    margin-top: 14px;
+    font-size: 1rem;
+    color: var(--on-dark-soft);
+  }
+  .stat-compare {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(20px, 5vw, 56px);
+    flex-wrap: wrap;
+    margin-top: 58px;
+  }
+  .stat-compare .item { text-align: center; }
+  .stat-compare .figure {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.4rem, 6.6vw, 4.6rem);
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    background: linear-gradient(135deg, #ffffff 0%, #9fc3e6 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-compare .item.dim .figure { background: linear-gradient(135deg, #cfe0ef 0%, #6d94b6 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-compare .figure-label { margin: 10px auto 0; font-size: 0.86rem; color: var(--on-dark-soft); max-width: 22ch; text-align: center; }
+  .stat-compare .divider { width: 1px; height: 64px; background: var(--on-dark-line); }
+  @media (max-width: 640px) { .stat-compare .divider { display: none; } }
+  .source-note {
+    text-align: center;
+    margin-top: 18px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: rgba(245,247,250,0.45);
+  }
+  .stat-mini-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    margin-top: 60px;
+    max-width: 780px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .stat-mini {
+    border-top: 1px solid var(--on-dark-line);
+    padding-top: 16px;
+    text-align: center;
+  }
+  .stat-mini .n {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.5rem;
+    color: #fff;
+  }
+  .stat-mini .l { font-size: 0.8rem; color: var(--on-dark-soft); margin: 6px auto 0; max-width: 24ch; text-align: center; }
+  @media (max-width: 640px) { .stat-mini-row { grid-template-columns: 1fr; } }
+
+  /* ---- module grid ---- */
+  .center-head { text-align: center; max-width: 700px; margin: 0 auto; }
+  .center-head p.sub { margin-left: auto; margin-right: auto; }
+
+  .mod-group { margin-top: 64px; }
+  .mod-group:first-of-type { margin-top: 56px; }
+  .mod-group-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+    margin-bottom: 26px;
+  }
+  .mod-group-title {
+    font-family: var(--font-display);
+    font-weight: 650;
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  .mod-group-sub { font-size: 0.92rem; color: var(--text-soft); margin: 0; }
+
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .tile {
+    border-radius: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    background: rgba(15, 76, 129, 0.055);
+    color: var(--text);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+  .module-grid.in .tile { opacity: 1; transform: translateY(0); }
+  .tile:hover {
+    border-color: var(--accent);
+    background: rgba(15, 76, 129, 0.13);
+    box-shadow: 0 10px 22px rgba(15,76,129,0.14);
+    transform: translateY(-3px);
+  }
+  .tile .ic-badge {
+    flex: none;
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .tile .ic-badge svg { width: 20px; height: 20px; }
+  .tile .t-text { min-width: 0; }
+  .tile .t-name {
+    display: block;
+    font-size: 0.94rem;
+    font-weight: 650;
+    line-height: 1.25;
+  }
+  .tile .t-desc {
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    line-height: 1.5;
+    margin: 6px 0 0;
+  }
+
+  @media (max-width: 900px) { .module-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .module-grid { grid-template-columns: 1fr; } }
+
+  /* ---- device frame ---- */
+  .device-wrap { margin-top: 70px; perspective: 1600px; position: relative; }
+  .device-wrap::before {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    width: min(1100px, 130%);
+    aspect-ratio: 16/9;
+    transform: translate(-50%, -50%);
+    background:
+      radial-gradient(circle at 30% 30%, rgba(15,76,129,0.16), transparent 60%),
+      radial-gradient(circle at 75% 70%, rgba(43,108,176,0.14), transparent 55%);
+    filter: blur(10px);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .device {
+    max-width: 1000px;
+    margin: 0 auto;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 40px 90px rgba(8,28,48,0.28), 0 2px 0 rgba(255,255,255,0.6) inset;
+    transform: rotateX(8deg) translateY(24px);
+    transition: transform 0.1s linear;
+    will-change: transform;
+    position: relative;
+    z-index: 1;
+  }
+  .device-bar {
+    background: #E7ECF2;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .device-bar .dots { display: flex; gap: 6px; flex: none; }
+  .device-bar i { width: 10px; height: 10px; border-radius: 50%; background: #D0D7DF; display: block; }
+  .device-bar .addr {
+    flex: 1;
+    max-width: 320px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    text-align: center;
+  }
+  .device-body { display: flex; min-height: 420px; background: var(--panel); }
+  .device-rail {
+    width: 64px;
+    background: var(--sidebar);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 0;
+    flex: none;
+  }
+  .device-rail .r-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+  }
+  .device-rail .r-icon svg { width: 18px; height: 18px; }
+  .device-rail .r-icon.active { background: var(--accent); color: #fff; }
+  .device-content { flex: 1; padding: 22px 26px; }
+  .device-content .d-title { font-size: 1.05rem; font-weight: 600; color: var(--text); }
+  .device-content .d-sub { font-size: 0.8rem; color: var(--text-soft); margin-top: 2px; }
+  .d-toolbar { display: flex; gap: 10px; margin: 18px 0; }
+  .d-toolbar .d-btn {
+    font-size: 0.76rem; padding: 7px 14px; border-radius: 6px; font-weight: 600;
+  }
+  .d-toolbar .d-btn.primary { background: var(--accent); color: #fff; }
+  .d-toolbar .d-btn.ghost { border: 1px solid var(--line); color: var(--text-soft); }
+  table.d-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  table.d-table th {
+    text-align: left; font-weight: 600; color: var(--text-soft);
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 8px 10px; border-bottom: 1px solid var(--line);
+  }
+  table.d-table td { padding: 9px 10px; border-bottom: 1px solid var(--line); color: var(--text); }
+  table.d-table td.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .d-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+  .d-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .d-chip.ok { background: rgba(30,142,62,0.12); color: #1E8E3E; }
+  .d-chip.wait { background: rgba(183,121,31,0.12); color: #B7791F; }
+  @media (max-width: 720px) { .device { transform: none !important; } .device-rail { width: 48px; } }
+
+  /* ---- login showcase ---- */
+  .login-frame {
+    max-width: 880px;
+    margin: 0 auto;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 40px 90px rgba(8,28,48,0.24), 0 2px 0 rgba(255,255,255,0.6) inset;
+    position: relative;
+    z-index: 1;
+  }
+  .login-body { display: flex; min-height: 380px; background: var(--panel); }
+  .login-brand {
+    flex: 1.1;
+    background: linear-gradient(150deg, var(--accent) 0%, var(--ink) 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .login-brand::after {
+    content: "";
+    position: absolute; inset: -40% -20% auto auto;
+    width: 60%; aspect-ratio: 1;
+    background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 70%);
+  }
+  .login-brand svg.b-mark { width: 34px; height: 34px; position: relative; z-index: 1; }
+  .login-brand .b-org { font-family: var(--font-display); font-weight: 650; font-size: 1.3rem; position: relative; z-index: 1; }
+  .login-brand .b-msg { font-size: 0.92rem; color: rgba(255,255,255,0.82); max-width: 26ch; line-height: 1.5; position: relative; z-index: 1; }
+  .login-form {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+  }
+  .login-form .lf-title { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .login-form label { font-size: 0.76rem; color: var(--text-soft); }
+  .login-form .fake-input {
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+    font-size: 0.86rem; color: var(--text-soft); background: var(--bg);
+  }
+  .login-form .lf-btn {
+    margin-top: 6px; text-align: center; padding: 11px; border-radius: 8px;
+    background: var(--accent); color: #fff; font-size: 0.86rem; font-weight: 600;
+  }
+  .login-form .lf-alt { text-align: center; font-size: 0.74rem; color: var(--text-soft); text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 640px) { .login-body { flex-direction: column; } }
+
+  /* ---- plans ---- */
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 60px;
+  }
+  .plan-card {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 30px 26px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .plan-grid.in .plan-card { opacity: 1; transform: translateY(0); }
+  .plan-card:hover { box-shadow: 0 20px 40px rgba(15,76,129,0.12); border-color: var(--accent); }
+  .plan-card.featured { border-color: var(--accent); box-shadow: 0 20px 44px rgba(15,76,129,0.14); }
+  .plan-card h3 { font-family: var(--font-display); font-size: 1.4rem; margin: 0; color: var(--text); }
+  .plan-card .tag {
+    font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--accent); margin-top: 6px; display: block;
+  }
+  .plan-card .modules {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin: 18px 0; padding-top: 16px; border-top: 1px solid var(--line);
+  }
+  .plan-card .modules .m-ic {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .plan-card .modules .m-ic svg { width: 16px; height: 16px; }
+  .plan-card .who { font-size: 0.88rem; color: var(--text-soft); line-height: 1.5; }
+  @media (max-width: 860px) { .plan-grid { grid-template-columns: 1fr; } }
+
+  /* ---- trust ---- */
+  .trust-quote {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 3vw, 2.3rem);
+    line-height: 1.35;
+    max-width: 22ch;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .trust-quote b { color: var(--accent); font-weight: 700; }
+  .trust-foot { margin-top: 30px; font-size: 0.9rem; color: var(--text-soft); }
+
+  /* ---- closing ---- */
+  .closing { text-align: center; }
+  .closing .btn { margin-top: 36px; }
+
+  /* ---- footer ---- */
+  footer {
+    background: var(--ink-deep);
+    color: var(--on-dark-soft);
+    padding: 46px 0;
+    font-size: 0.82rem;
+  }
+  .foot-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .foot-brand { display: flex; align-items: center; gap: 10px; color: #fff; }
+  .foot-brand svg { width: 20px; height: 20px; }
+  .foot-brand span { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.06em; }
+  footer .tagline { font-family: var(--font-mono); font-size: 0.74rem; }
+</style>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <defs>
+    <symbol id="kallpa-glyph" viewBox="0 0 100 100">
+      <polygon points="8,84 34,32 48,54 64,18 92,84" fill="currentColor" opacity="0.92" />
+      <polyline points="16,86 40,58 31,58 62,20" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+    </symbol>
+
+    <g id="ic-defs" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <symbol id="ic-per" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><path d="M15.5 6.6a2.8 2.8 0 1 1 1 5.4"/><path d="M16.5 14.7c2.2.4 3.6 1.8 4 4.3"/></symbol>
+      <symbol id="ic-afi" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.2"/><path d="M4.5 19c.6-3 2.7-4.5 5.5-4.5 1.7 0 3.1.6 4.1 1.5"/><path d="M19 8v6M16 11h6"/></symbol>
+      <symbol id="ic-rec" viewBox="0 0 24 24"><circle cx="8.5" cy="8.5" r="4.7"/><circle cx="15.5" cy="15.5" r="4.7"/><path d="M13.2 5.1a4.7 4.7 0 0 1 5.7 5.7"/></symbol>
+      <symbol id="ic-cic" viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H19v3"/><path d="M4 7.5V17a2.5 2.5 0 0 0 2.5 2.5H21V8H6.5A2.5 2.5 0 0 1 4 7.5z"/><path d="M16.5 13.5h2"/></symbol>
+      <symbol id="ic-com" viewBox="0 0 24 24"><path d="M5 19L19 5"/><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></symbol>
+      <symbol id="ic-cob" viewBox="0 0 24 24"><path d="M9 6.5l4.5 4.5"/><rect x="3.3" y="10" width="4.6" height="10.5" rx="1" transform="rotate(-45 5.6 15.3)"/><path d="M13 5.5l5.5 5.5"/><rect x="10.7" y="3.5" width="9" height="4" rx="1" transform="rotate(45 15.2 5.5)"/><path d="M3 20.5h9"/></symbol>
+      <symbol id="ic-ben" viewBox="0 0 24 24"><path d="M12 6.5c-1.2-1.6-3-2.3-4.7-1.7C5 5.7 3.8 8 4.4 10.2c.5 1.9 2.2 3.5 4 5l3.6 3 3.6-3c1.8-1.5 3.5-3.1 4-5 .6-2.2-.6-4.5-2.9-5.4-1.7-.6-3.5.1-4.7 1.7z"/><path d="M8.5 12l2 1.8 2-2 2 1.7"/></symbol>
+      <symbol id="ic-tra" viewBox="0 0 24 24"><path d="M4 8h13M13 4l4 4-4 4"/><path d="M20 16H7M11 12l-4 4 4 4"/></symbol>
+      <symbol id="ic-inv" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-9"/><path d="M15 6h6v6"/></symbol>
+      <symbol id="ic-vcu" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.5 7.5h7"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 15.8h.01M12 15.8h.01M15.5 15.8h.01"/></symbol>
+      <symbol id="ic-ate" viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/><path d="M19 19v.5A2.5 2.5 0 0 1 16.5 22H13"/></symbol>
+      <symbol id="ic-con" viewBox="0 0 24 24"><path d="M4 5.5A2 2 0 0 1 6 4h6v16H6a2 2 0 0 0-2 2z"/><path d="M20 5.5A2 2 0 0 0 18 4h-6v16h6a2 2 0 0 1 2 2z"/></symbol>
+      <symbol id="ic-tes" viewBox="0 0 24 24"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9v.01M18 15v.01"/></symbol>
+      <symbol id="ic-reg" viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="17" rx="2"/><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M8.5 13l2.3 2.3L15.5 11"/></symbol>
+      <symbol id="ic-adm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.2 5.2L7 7M17 17l1.8 1.8M18.8 5.2L17 7M7 17l-1.8 1.8"/></symbol>
+      <symbol id="ic-fve" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></symbol>
+    </g>
+  </defs>
+</svg>
+
+<nav class="nav" id="nav">
+  <div class="nav-brand">
+    <svg viewBox="0 0 100 100"><use href="#kallpa-glyph"></use></svg>
+    <span>KALLPA PENSION</span>
+  </div>
+  <div class="nav-links">
+    <a href="#producto">Producto</a>
+    <a href="#modulos">Módulos</a>
+    <a href="#identidad">Identidad</a>
+    <a href="#interfaz">Interfaz</a>
+    <a href="#planes">Planes</a>
+  </div>
+  <a class="nav-cta" href="mailto:administracion@kallpaio.com">Hablemos</a>
+</nav>
+
+<section class="hero" id="hero">
+  <canvas id="particles" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <svg class="hero-mark reveal in" viewBox="0 0 100 100"><use href="#kallpa-glyph"></use></svg>
+    <h1 class="hero-title reveal in">El core previsional, repensado desde cero.</h1>
+    <p class="hero-sub reveal in" style="transition-delay:.15s">Un sistema modular para administradoras de fondos de pensiones, construido para más de un millón de afiliados y listo para crecer con el negocio.</p>
+    <div class="hero-cta reveal in" style="transition-delay:.3s">
+      <a class="btn btn-primary" href="#producto">Ver el producto</a>
+      <a class="btn btn-ghost" href="mailto:administracion@kallpaio.com">Hablar con nosotros</a>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>Desliza</span><span class="chev"></span></div>
+</section>
+
+<section class="dark" id="producto">
+  <div class="wrap stat-hero">
+    <div class="eyebrow reveal">EL MERCADO PERUANO</div>
+    <h2 class="claim reveal">Millones de afiliados. Pocos días para procesarlos a todos.</h2>
+    <p class="sub reveal" style="margin-left:auto;margin-right:auto;">El Sistema Privado de Pensiones peruano ya es grande, y la brecha entre quién está afiliado y quién aporta cada mes es el problema real que un core previsional tiene que resolver.</p>
+
+    <div class="stat-compare">
+      <div class="item reveal">
+        <div class="figure" id="statAfiliados">0</div>
+        <div class="figure-label">afiliados registrados en el SPP</div>
+      </div>
+      <div class="divider"></div>
+      <div class="item dim reveal" style="transition-delay:.15s">
+        <div class="figure" id="statCotizantes">0</div>
+        <div class="figure-label">cotizantes activos por mes (41% del total)</div>
+      </div>
+    </div>
+    <div class="source-note reveal" style="transition-delay:.3s">Fuente: SBS, Boletín Estadístico de AFP, mayo 2026</div>
+
+    <div class="stat-mini-row">
+      <div class="stat-mini reveal"><div class="n">5 días hábiles</div><div class="l">para que el empleador declare y pague el aporte</div></div>
+      <div class="stat-mini reveal" style="transition-delay:.1s"><div class="n">+2 días útiles</div><div class="l">para que la entidad recaudadora lo acredite en la CIC</div></div>
+      <div class="stat-mini reveal" style="transition-delay:.2s"><div class="n">Cientos de millones</div><div class="l">de movimientos históricos por cuenta individual</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="light" id="modulos">
+  <div class="wrap">
+    <div class="center-head">
+      <div class="eyebrow reveal">EL PRODUCTO</div>
+      <h2 class="claim reveal">Un core. Dieciséis módulos.</h2>
+      <p class="sub reveal">Cada módulo es una pieza independiente, con su propio despliegue y su propia base de datos. Empiezas con el núcleo base y agregas lo que tu operación necesite, cuando lo necesite.</p>
+    </div>
+
+    <div class="mod-group">
+      <div class="mod-group-head reveal">
+        <h3 class="mod-group-title">Módulos Base</h3>
+        <p class="mod-group-sub">Lo mínimo para operar el ciclo previsional. Se instalan siempre.</p>
+      </div>
+      <div class="module-grid" id="moduleGridBase">
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-per"></use></svg></span><div class="t-text"><span class="t-name">Personas</span><p class="t-desc">Identidad única de personas naturales, jurídicas y empleadores. Todo lo demás del sistema la referencia.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-adm"></use></svg></span><div class="t-text"><span class="t-name">Administración y Seguridad</span><p class="t-desc">Seguridad, parametría, registro de módulos instalados y calendario de procesos de toda la operación.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-afi"></use></svg></span><div class="t-text"><span class="t-name">Afiliación</span><p class="t-desc">Alta y ciclo de vida del afiliado, desde su ingreso al sistema hasta cualquier cambio de condición.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-rec"></use></svg></span><div class="t-text"><span class="t-name">Recaudación y Aportes</span><p class="t-desc">Planillas, pagos y acreditación masiva de aportes en las cuentas individuales de cada afiliado.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-cic"></use></svg></span><div class="t-text"><span class="t-name">Cuentas Individuales</span><p class="t-desc">Saldos y movimientos en cuotas de cada afiliado y fondo: el corazón del sistema previsional.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-com"></use></svg></span><div class="t-text"><span class="t-name">Comisiones</span><p class="t-desc">Cálculo de la comisión de la administradora y la prima del seguro, junto con cada aporte.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-vcu"></use></svg></span><div class="t-text"><span class="t-name">Valor Cuota</span><p class="t-desc">Valor cuota diario por fondo: convierte soles en cuotas y cuotas en soles, todos los días.</p></div></div>
+      </div>
+    </div>
+
+    <div class="mod-group">
+      <div class="mod-group-head reveal">
+        <h3 class="mod-group-title">Módulos Opcionales</h3>
+        <p class="mod-group-sub">Se agregan cuando tu operación los necesita, sobre cualquier plan.</p>
+      </div>
+      <div class="module-grid" id="moduleGridOpt">
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-cob"></use></svg></span><div class="t-text"><span class="t-name">Cobranza</span><p class="t-desc">Gestión de la deuda previsional de empleadores morosos; puede tercerizarse en un cobrador externo.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-ben"></use></svg></span><div class="t-text"><span class="t-name">Beneficios y Prestaciones</span><p class="t-desc">Trámites de pensión: jubilación, invalidez, sobrevivencia y gastos de sepelio.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-tra"></use></svg></span><div class="t-text"><span class="t-name">Traspasos</span><p class="t-desc">Ciclo mensual de traspasos de afiliados entre administradoras de fondos de pensiones.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-inv"></use></svg></span><div class="t-text"><span class="t-name">Inversiones</span><p class="t-desc">Portafolio, valorización y límites de inversión de los fondos administrados.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-ate"></use></svg></span><div class="t-text"><span class="t-name">Atención al Afiliado</span><p class="t-desc">Trámites, solicitudes, reclamos y notificaciones multicanal hacia el afiliado.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-con"></use></svg></span><div class="t-text"><span class="t-name">Contabilidad</span><p class="t-desc">Asientos contables de toda la operación; frecuentemente tercerizada en un ERP externo.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-tes"></use></svg></span><div class="t-text"><span class="t-name">Tesorería</span><p class="t-desc">Cuentas bancarias y órdenes de pago; frecuentemente tercerizada también.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-reg"></use></svg></span><div class="t-text"><span class="t-name">Regulatorio SBS</span><p class="t-desc">Reportes y anexos normativos que la administradora envía al regulador.</p></div></div>
+        <div class="tile"><span class="ic-badge"><svg><use href="#ic-fve"></use></svg></span><div class="t-text"><span class="t-name">Fuerza de Ventas</span><p class="t-desc">Promotores, jerarquía comercial configurable y comisiones de venta.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="identidad">
+  <div class="wrap">
+    <div class="center-head">
+      <div class="eyebrow reveal">IDENTIDAD DE MARCA</div>
+      <h2 class="claim reveal">Cada instalación, con su propia identidad.</h2>
+      <p class="sub reveal">El logo, la imagen y los colores de la pantalla de acceso se configuran por administradora, dentro de la misma paleta del sistema. Así cada cliente ve su propia marca desde el primer clic.</p>
+    </div>
+    <div class="device-wrap reveal">
+      <div class="login-frame">
+        <div class="device-bar"><span class="dots"><i></i><i></i><i></i></span><span class="addr">app.kallpapension.io/ingresar</span></div>
+        <div class="login-body">
+          <div class="login-brand">
+            <svg class="b-mark" viewBox="0 0 100 100"><use href="#kallpa-glyph"></use></svg>
+            <div class="b-org">AFP Ejemplo</div>
+            <div class="b-msg">"Tu futuro, en buenas manos." Logo, imagen y colores, a tu medida.</div>
+          </div>
+          <div class="login-form">
+            <div class="lf-title">Ingresar</div>
+            <label>Correo corporativo</label>
+            <div class="fake-input">nombre@afp-ejemplo.pe</div>
+            <div class="lf-btn">Continuar</div>
+            <div class="lf-alt">Acceso local (solo contingencia)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="interfaz">
+  <div class="wrap">
+    <div class="center-head">
+      <div class="eyebrow reveal">INTERFAZ DE USUARIO</div>
+      <h2 class="claim reveal">Una experiencia pensada para quien la usa ocho horas al día.</h2>
+      <p class="sub reveal">La misma grilla, los mismos formularios, el mismo lenguaje visual en los 16 módulos: clara, consistente y rápida, para operar sin fricción, no solo para verse bien.</p>
+    </div>
+    <div class="device-wrap reveal" id="deviceWrap">
+      <div class="device" id="device">
+        <div class="device-bar"><span class="dots"><i></i><i></i><i></i></span><span class="addr">app.kallpapension.io/rec/planillas</span></div>
+        <div class="device-body">
+          <div class="device-rail">
+            <div class="r-icon active"><svg><use href="#ic-rec"></use></svg></div>
+            <div class="r-icon"><svg><use href="#ic-cic"></use></svg></div>
+            <div class="r-icon"><svg><use href="#ic-com"></use></svg></div>
+            <div class="r-icon"><svg><use href="#ic-afi"></use></svg></div>
+            <div class="r-icon"><svg><use href="#ic-adm"></use></svg></div>
+          </div>
+          <div class="device-content">
+            <div class="d-title">Planillas de aportes</div>
+            <div class="d-sub">Recaudación y Aportes</div>
+            <div class="d-toolbar"><span class="d-btn primary">Nueva planilla</span><span class="d-btn ghost">Exportar</span></div>
+            <table class="d-table">
+              <thead><tr><th>Empleador</th><th>Período</th><th>Estado</th><th style="text-align:right">Monto</th></tr></thead>
+              <tbody>
+                <tr><td>Textiles del Sur S.A.C.</td><td>2026-06</td><td><span class="d-chip ok"><i class="dot"></i>Acreditado</span></td><td class="num">S/ 84,210.00</td></tr>
+                <tr><td>Comercial Andina E.I.R.L.</td><td>2026-06</td><td><span class="d-chip ok"><i class="dot"></i>Acreditado</span></td><td class="num">S/ 52,940.50</td></tr>
+                <tr><td>Grupo Logístico Perú</td><td>2026-06</td><td><span class="d-chip wait"><i class="dot"></i>En individualización</span></td><td class="num">S/ 128,760.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="dark" id="planes">
+  <div class="wrap">
+    <div class="center-head">
+      <div class="eyebrow reveal">MODELO COMERCIAL</div>
+      <h2 class="claim reveal">Se vende por módulos. Crece con tu operación.</h2>
+    </div>
+    <div class="plan-grid" id="planGrid">
+      <div class="plan-card">
+        <span class="tag">Plan</span>
+        <h3>Plan Básico</h3>
+        <div class="modules">
+          <span class="m-ic" title="Personas"><svg><use href="#ic-per"></use></svg></span>
+          <span class="m-ic" title="Administración y Seguridad"><svg><use href="#ic-adm"></use></svg></span>
+          <span class="m-ic" title="Afiliación"><svg><use href="#ic-afi"></use></svg></span>
+          <span class="m-ic" title="Recaudación y Aportes"><svg><use href="#ic-rec"></use></svg></span>
+          <span class="m-ic" title="Cuentas Individuales"><svg><use href="#ic-cic"></use></svg></span>
+          <span class="m-ic" title="Comisiones"><svg><use href="#ic-com"></use></svg></span>
+          <span class="m-ic" title="Valor Cuota"><svg><use href="#ic-vcu"></use></svg></span>
+        </div>
+        <p class="who">Operación mínima del ciclo previsional; contabilidad y tesorería tercerizadas.</p>
+      </div>
+      <div class="plan-card featured">
+        <span class="tag">Plan</span>
+        <h3>Plan Esencial Plus</h3>
+        <div class="modules">
+          <span class="m-ic" title="Personas"><svg><use href="#ic-per"></use></svg></span>
+          <span class="m-ic" title="Administración y Seguridad"><svg><use href="#ic-adm"></use></svg></span>
+          <span class="m-ic" title="Afiliación"><svg><use href="#ic-afi"></use></svg></span>
+          <span class="m-ic" title="Recaudación y Aportes"><svg><use href="#ic-rec"></use></svg></span>
+          <span class="m-ic" title="Cuentas Individuales"><svg><use href="#ic-cic"></use></svg></span>
+          <span class="m-ic" title="Comisiones"><svg><use href="#ic-com"></use></svg></span>
+          <span class="m-ic" title="Valor Cuota"><svg><use href="#ic-vcu"></use></svg></span>
+          <span class="m-ic" title="Cobranza"><svg><use href="#ic-cob"></use></svg></span>
+          <span class="m-ic" title="Traspasos"><svg><use href="#ic-tra"></use></svg></span>
+          <span class="m-ic" title="Atención al Afiliado"><svg><use href="#ic-ate"></use></svg></span>
+          <span class="m-ic" title="Regulatorio SBS"><svg><use href="#ic-reg"></use></svg></span>
+        </div>
+        <p class="who">Administradora en operación plena: mora, traspasos, atención y cumplimiento normativo.</p>
+      </div>
+      <div class="plan-card">
+        <span class="tag">Plan</span>
+        <h3>Plan Operativo Plus</h3>
+        <div class="modules">
+          <span class="m-ic" title="Personas"><svg><use href="#ic-per"></use></svg></span>
+          <span class="m-ic" title="Administración y Seguridad"><svg><use href="#ic-adm"></use></svg></span>
+          <span class="m-ic" title="Afiliación"><svg><use href="#ic-afi"></use></svg></span>
+          <span class="m-ic" title="Recaudación y Aportes"><svg><use href="#ic-rec"></use></svg></span>
+          <span class="m-ic" title="Cuentas Individuales"><svg><use href="#ic-cic"></use></svg></span>
+          <span class="m-ic" title="Comisiones"><svg><use href="#ic-com"></use></svg></span>
+          <span class="m-ic" title="Valor Cuota"><svg><use href="#ic-vcu"></use></svg></span>
+          <span class="m-ic" title="Cobranza"><svg><use href="#ic-cob"></use></svg></span>
+          <span class="m-ic" title="Traspasos"><svg><use href="#ic-tra"></use></svg></span>
+          <span class="m-ic" title="Atención al Afiliado"><svg><use href="#ic-ate"></use></svg></span>
+          <span class="m-ic" title="Regulatorio SBS"><svg><use href="#ic-reg"></use></svg></span>
+          <span class="m-ic" title="Beneficios y Prestaciones"><svg><use href="#ic-ben"></use></svg></span>
+          <span class="m-ic" title="Inversiones"><svg><use href="#ic-inv"></use></svg></span>
+          <span class="m-ic" title="Contabilidad"><svg><use href="#ic-con"></use></svg></span>
+          <span class="m-ic" title="Tesorería"><svg><use href="#ic-tes"></use></svg></span>
+          <span class="m-ic" title="Fuerza de Ventas"><svg><use href="#ic-fve"></use></svg></span>
+        </div>
+        <p class="who">Core completo, sin dependencia de sistemas externos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="light">
+  <div class="wrap">
+    <div class="trust-quote reveal">Consultores de negocio y técnicos con <b>más de 10 años</b> en el negocio de las AFP, en el mismo equipo.</div>
+    <div class="trust-foot reveal">Esa combinación es la que permite construir un sistema robusto, con las mejores prácticas del negocio previsional y de la ingeniería de software, sin perder conocimiento en el camino.</div>
+  </div>
+</section>
+
+<section class="dark closing">
+  <div class="wrap">
+    <div class="eyebrow reveal" style="text-align:center;">KALLPA IO S.A.C.</div>
+    <h2 class="claim reveal">Kallpa Pension es el primer producto.<br />No el único.</h2>
+    <p class="sub reveal" style="margin-left:auto;margin-right:auto;">La misma disciplina de negocio y tecnología que construimos para las AFP es la que sostendrá el siguiente negocio financiero que decidamos construir.</p>
+    <a class="btn btn-primary reveal" href="mailto:administracion@kallpaio.com">Conversemos</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <div class="foot-brand">
+      <svg viewBox="0 0 100 100"><use href="#kallpa-glyph"></use></svg>
+      <span>KALLPA IO S.A.C.</span>
+    </div>
+    <div class="tagline">Kallpa: fuerza, en quechua. La fuerza de empezar bien, para seguir construyendo.</div>
+    <div>© 2026 Kallpa IO S.A.C.</div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // nav background swap on dark/light section
+    var nav = document.getElementById('nav');
+    var lightSections = Array.prototype.slice.call(document.querySelectorAll('section.light, section.panel'));
+    var navIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && e.intersectionRatio > 0.5) {
+          nav.classList.toggle('on-light', true);
+        }
+      });
+      var anyLightVisible = lightSections.some(function (s) {
+        var r = s.getBoundingClientRect();
+        return r.top < 60 && r.bottom > 60;
+      });
+      nav.classList.toggle('on-light', anyLightVisible);
+    }, { threshold: [0, 0.5, 1] });
+    lightSections.forEach(function (s) { navIo.observe(s); });
+    document.addEventListener('scroll', function () {
+      var anyLightVisible = lightSections.some(function (s) {
+        var r = s.getBoundingClientRect();
+        return r.top < 60 && r.bottom > 60;
+      });
+      nav.classList.toggle('on-light', anyLightVisible);
+    }, { passive: true });
+
+    // generic reveal
+    var revealIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) e.target.classList.add('in');
+      });
+    }, { threshold: 0.18 });
+    document.querySelectorAll('.reveal').forEach(function (el) { revealIo.observe(el); });
+
+    // module grid stagger (base + optional groups)
+    var gridIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: 0.1 });
+    ['moduleGridBase', 'moduleGridOpt'].forEach(function (id) {
+      var grid = document.getElementById(id);
+      Array.prototype.forEach.call(grid.children, function (c, i) { c.style.transitionDelay = (i * 30) + 'ms'; });
+      gridIo.observe(grid);
+    });
+
+    // plan cards stagger
+    var planGrid = document.getElementById('planGrid');
+    Array.prototype.forEach.call(planGrid.children, function (c, i) { c.style.transitionDelay = (i * 110) + 'ms'; });
+    var planIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: 0.2 });
+    planIo.observe(planGrid);
+
+    // stat count-up (two figures, same run)
+    var statPairs = [
+      { el: document.getElementById('statAfiliados'), target: 10517874, suffix: '' },
+      { el: document.getElementById('statCotizantes'), target: 4300000, suffix: '+' }
+    ];
+    var counted = false;
+    var statIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && !counted) {
+          counted = true;
+          if (reduced) {
+            statPairs.forEach(function (s) { s.el.textContent = s.target.toLocaleString('es-PE') + s.suffix; });
+            return;
+          }
+          var start = null;
+          var dur = 1500;
+          function step(ts) {
+            if (!start) start = ts;
+            var p = Math.min(1, (ts - start) / dur);
+            var eased = 1 - Math.pow(1 - p, 3);
+            statPairs.forEach(function (s) {
+              var val = Math.floor(s.target * eased);
+              s.el.textContent = val.toLocaleString('es-PE') + (p >= 1 ? s.suffix : '');
+            });
+            if (p < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        }
+      });
+    }, { threshold: 0.4 });
+    statIo.observe(document.getElementById('statAfiliados'));
+
+    // device tilt parallax
+    var device = document.getElementById('device');
+    var deviceWrap = document.getElementById('deviceWrap');
+    if (!reduced) {
+      var ticking = false;
+      function updateTilt() {
+        ticking = false;
+        var r = deviceWrap.getBoundingClientRect();
+        var vh = window.innerHeight;
+        var center = r.top + r.height / 2;
+        var progress = 1 - Math.min(1, Math.max(0, center / vh));
+        var deg = 8 - progress * 8;
+        var ty = 24 - progress * 24;
+        device.style.transform = 'rotateX(' + deg.toFixed(2) + 'deg) translateY(' + ty.toFixed(1) + 'px)';
+      }
+      document.addEventListener('scroll', function () {
+        if (!ticking) { window.requestAnimationFrame(updateTilt); ticking = true; }
+      }, { passive: true });
+      updateTilt();
+    } else {
+      device.style.transform = 'none';
+    }
+
+    // ambient particle field in hero
+    var canvas = document.getElementById('particles');
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    function resize() {
+      canvas.width = canvas.offsetWidth * devicePixelRatio;
+      canvas.height = canvas.offsetHeight * devicePixelRatio;
+    }
+    function initParticles() {
+      particles = [];
+      var count = Math.round((canvas.offsetWidth * canvas.offsetHeight) / 26000);
+      for (var i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: (Math.random() * 1.4 + 0.6) * devicePixelRatio,
+          vx: (Math.random() * 0.25 + 0.06) * devicePixelRatio,
+          vy: (-Math.random() * 0.18 - 0.04) * devicePixelRatio,
+          a: Math.random() * 0.5 + 0.15
+        });
+      }
+    }
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(function (p) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x > canvas.width + 10) p.x = -10;
+        if (p.y < -10) p.y = canvas.height + 10;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,' + p.a + ')';
+        ctx.fill();
+      });
+      if (!reduced) requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize', function () { resize(); initParticles(); });
+    resize(); initParticles();
+    if (reduced) { draw(); } else { requestAnimationFrame(draw); }
+  })();
+</script>
+</body>
+</html>
